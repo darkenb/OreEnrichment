@@ -93,9 +93,24 @@ A catalysed recipe shows the icon of its normal recipe with a flask badge.
 
 The copies are made from the recipes the loaded game has, so recipes of other mods get them too. There are none for buildings, for recipes the game bars from extra products, and for any recipe whose copy would close a production loop.
 
+## Dark Fog recycling
+
+The drops of the Dark Fog can be broken down into raw materials on the "Recycling" tab, in an assembler (energy shards in a chemical plant):
+
+| Drop | Gives |
+|---|---|
+| 1 Dark Fog Matrix | 4 iron ore, 4 copper ore |
+| 1 Silicon-based Neuron | 6 silicon ore, 1 fractal silicon |
+| 1 Matter Recombinator | 6 titanium ore, 1 optical grating crystal |
+| 1 Negentropy Singularity | 4 unipolar magnets, 2 spiniform stalagmite crystals |
+| 1 Core Element | 4 kimberlite ore, 4 fire ice |
+| 10 Energy Shards | 6 hydrogen, 2 deuterium |
+
+A product the loaded game does not have is left out of its recipe. Works with any Dark Fog settings, including BUG_DarkFogTuner's.
+
 ## Research
 
-Four technologies on the main tech page, in a row under the lowest one: Ore Crushing, then Ore Enrichment I, II and III. Each also needs the technology that gives its additives (water pump, hydrogen, sulfuric acid, interstellar logistics). A second row holds Catalysis I to V; each needs the technology that gives its catalyst. A third row holds Precious Metal Recovery (after sulfuric acid), Gold and Silver Electronics and Gold and Silver Construction (both after processors) and, with GenesisBook, Fluid Chemistry.
+Four technologies on the main tech page, in a row under the lowest one: Ore Crushing, then Ore Enrichment I, II and III. Each also needs the technology that gives its additives (water pump, hydrogen, sulfuric acid, interstellar logistics). A second row holds Catalysis I to V; each needs the technology that gives its catalyst. A third row holds Precious Metal Recovery (after sulfuric acid), Gold and Silver Electronics and Gold and Silver Construction (both after processors) and, with GenesisBook, Fluid Chemistry. Dark Fog Recycling follows them on the same row, after Ore Crushing.
 
 In the vanilla game each technology costs one more kind of matrix than the one before it (100, 200, 400 ... of each). On a changed tech tree with its own matrices, each technology costs what the technology it waits for costs.
 

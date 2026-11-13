@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
@@ -8,9 +9,9 @@ using CommonAPI.Systems;
 using HarmonyLib;
 using UnityEngine;
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyInformationalVersion("1.1.0")]
 
 namespace OreEnrichment
 {
@@ -127,7 +128,7 @@ namespace OreEnrichment
         }
     }
 
-    [BepInPlugin(Guid, "BUG_OreEnrichment", "1.0.0")]
+    [BepInPlugin(Guid, "BUG_OreEnrichment", "1.1.0")]
     [BepInDependency(CommonAPIPlugin.GUID)]
     [BepInDependency("me.xiaoye97.plugin.Dyson.LDBTool")]
     [CommonAPISubmoduleDependency(nameof(ProtoRegistry), nameof(TabSystem))]
@@ -146,6 +147,8 @@ namespace OreEnrichment
             var harmony = new Harmony(Guid);
             harmony.PatchAll(typeof(Plugin));
             harmony.PatchAll(typeof(Catalysis));
+            harmony.PatchAll(typeof(TabLayout));
+            TabLayout.Own = () => new[] { tabIndex, preciousTab, preciousTab2, recycleTab }.Concat(catalysisTabs);
             Lang.Current = Config.Bind("General", "Language", Language.English,
                 "Language of the mod's own texts: English, Chinese or Turkish (applies after restarting the game). Item and building names follow the game's language.").Value;
             using (ProtoRegistry.StartModLoad(Guid))
@@ -159,6 +162,7 @@ namespace OreEnrichment
                         IconRoot + Tables.Icons[o], ProtoRegistry.GetGridIndex(tab, o + 1, 1), 100, EItemType.Material).Productive = true;
                 preciousTab = TabSystem.RegisterTab(Guid + ":precious", new TabData("Au-Ag", IconRoot + "tab-precious"));
                 preciousTab2 = TabSystem.RegisterTab(Guid + ":precious2", new TabData("Au-Ag II", IconRoot + "tab-precious"));
+                recycleTab = TabSystem.RegisterTab(Guid + ":recycle", new TabData(Lang.T("Recycling"), IconRoot + "tab-recycle"));
                 for (int i = 0; i < Precious.Items.Length; i++)
                     ProtoRegistry.RegisterItem(Precious.Items[i], Lang.T(Precious.ItemNames[i]), Lang.T(PreciousItemDescs[i]),
                         IconRoot + Precious.ItemIcons[i], ProtoRegistry.GetGridIndex(preciousTab, i + 1, 1), 100, EItemType.Material).Productive = true;
@@ -255,7 +259,7 @@ namespace OreEnrichment
 
         // ---- The tab shows only in buildings that can run one of its unlocked recipes ----
         // Asked of the picker itself, so the game's filter and other mods' changes to it (building families) both count.
-        static int tabIndex, preciousTab, preciousTab2;
+        static int tabIndex, preciousTab, preciousTab2, recycleTab;
         static int[] catalysisTabs = new int[0];
 
         [HarmonyPostfix, HarmonyPatch(typeof(UIRecipePicker), "_OnOpen")]
@@ -267,7 +271,7 @@ namespace OreEnrichment
                 var t = Traverse.Create(__instance);
                 int current = t.Field<int>("currentType").Value;
                 var click = AccessTools.Method(typeof(UIRecipePicker), "OnTypeButtonClick");
-                var shown = new Dictionary<int, bool> { { tabIndex, false }, { preciousTab, false }, { preciousTab2, false } };
+                var shown = new Dictionary<int, bool> { { tabIndex, false }, { preciousTab, false }, { preciousTab2, false }, { recycleTab, false } };
                 foreach (int tab in catalysisTabs) shown[tab] = false;
                 foreach (int tab in new List<int>(shown.Keys))
                 {
@@ -315,6 +319,8 @@ namespace OreEnrichment
             catch (Exception e) { Log.LogWarning("Recipe icons keep the product's picture: " + e.Message); }
             try { Precious.Generate(preciousTab, preciousTab2, tabIndex, rowX, rowDx, rowY - 2 * RowGap, TechBase, TechBase + 1); }
             catch (Exception e) { Log.LogError("Gold and silver recipes not added: " + e); }
+            try { Recycling.Generate(recycleTab, new Vector2(rowX + Precious.TechNames.Length * rowDx, rowY - 2 * RowGap), TechBase); }
+            catch (Exception e) { Log.LogError("Dark Fog recycling recipes not added: " + e); }
             try
             {
                 var skip = new HashSet<int>(normals);  // the enrichment tiers already cover these

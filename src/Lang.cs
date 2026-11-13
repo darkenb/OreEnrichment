@@ -143,6 +143,15 @@ namespace OreEnrichment
             [" (Gold and Silver)"] = new[] { "（金银）", " (Altın ve Gümüş)" },
             [" (Fluid)"] = new[] { "（流体）", " (Akışkan)" },
             [" and "] = new[] { "和", " ve " },
+            ["Recycling"] = new[] { "回收", "Geri Dönüşüm" },
+            ["{0} Recycling"] = new[] { "{0}回收", "{0} Geri Dönüşümü" },
+            ["Dark Fog Recycling"] = new[] { "黑雾回收", "Kara Sis Geri Dönüşümü" },
+            ["Breaks Dark Fog drops down into raw materials."] = new[] { "将黑雾掉落物分解为原材料。", "Kara Sis ganimetini ham maddelere ayırır." },
+            ["Assemblers break Dark Fog drops down into ores and rare minerals; a chemical plant turns energy shards into hydrogen and deuterium."] = new[]
+            {
+                "制造台将黑雾掉落物分解为矿石和稀有矿物；化工厂将能量碎片转化为氢和重氢。",
+                "Montaj makineleri Kara Sis ganimetini cevherlere ve nadir minerallere ayırır; kimya tesisi enerji parçalarını hidrojen ve döteryuma çevirir.",
+            },
             ["{0} {1} from {2} batches of the normal inputs and {3}. The normal recipe makes {4} from the same inputs."] = new[] { "{2} 批普通原料加{3}产出 {0} 份{1}。同样的原料用普通配方只得 {4} 份。", "{2} parti normal girdi ve {3} ile {0} {1}. Normal tarif aynı girdilerden {4} üretir." },
             ["Each extra unit gives {0} more {1}."] = new[] { "每份额外材料多得 {0} 份{1}。", "Her ek birim {0} {1} daha verir." },
         };

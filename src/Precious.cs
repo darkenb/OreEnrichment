@@ -365,7 +365,7 @@ namespace OreEnrichment
             }
         }
 
-        static RecipeProto New(int id, string name, int type, int time, int[] items, int[] counts, int[] results, int[] resultCounts, int grid) => new RecipeProto
+        internal static RecipeProto New(int id, string name, int type, int time, int[] items, int[] counts, int[] results, int[] resultCounts, int grid) => new RecipeProto
         {
             ID = id,
             Name = name,
@@ -385,7 +385,7 @@ namespace OreEnrichment
         };
 
         // A recipe with the picture of an item and a badge laid over it (no atlas cell of its own; see Catalysis).
-        static void Mark(RecipeProto r, int item, string badge)
+        internal static void Mark(RecipeProto r, int item, string badge)
         {
             plain[r.ID] = item;
             r.IconPath = Plugin.IconRoot + "pv/" + r.ID;

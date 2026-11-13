@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Dark Fog recycling: the six Dark Fog drops break down into ores, rare minerals, hydrogen and deuterium on a new "Recycling" tab, under the Dark Fog Recycling technology.
+- The mod's tabs stay hidden in the replicator until one of their recipes is researched, and tabs without items no longer appear in the item filter, so its buttons fit the window.
+
 ## 1.0.0
 
 First release.
