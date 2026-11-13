@@ -1,0 +1,11 @@
+{
+    "name": "BUG_OreEnrichment",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/darkenb/OreEnrichment",
+    "description": "Crush ores into dust and smelt it for up to three times the ingots; gold and silver from copper refining give more electronics, buildings and ammunition; catalysed copies give a third more.",
+    "dependencies": [
+        "xiaoye97-BepInEx-5.4.17",
+        "CommonAPI-CommonAPI-1.6.7",
+        "xiaoye97-LDBTool-3.0.3"
+    ]
+}
