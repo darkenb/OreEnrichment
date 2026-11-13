@@ -319,7 +319,11 @@ namespace OreEnrichment
             catch (Exception e) { Log.LogWarning("Recipe icons keep the product's picture: " + e.Message); }
             try { Precious.Generate(preciousTab, preciousTab2, tabIndex, rowX, rowDx, rowY - 2 * RowGap, TechBase, TechBase + 1); }
             catch (Exception e) { Log.LogError("Gold and silver recipes not added: " + e); }
-            try { Recycling.Generate(recycleTab, new Vector2(rowX + Precious.TechNames.Length * rowDx, rowY - 2 * RowGap), TechBase); }
+            try
+            {
+                Recycling.Generate(new Vector2(rowX + Precious.TechNames.Length * rowDx, rowY - 2 * RowGap), TechBase);
+                Recycling.GenerateLevels(recycleTab, rowX, rowDx, rowY - 3 * RowGap, RowGap);
+            }
             catch (Exception e) { Log.LogError("Dark Fog recycling recipes not added: " + e); }
             try
             {

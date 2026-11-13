@@ -95,22 +95,30 @@ The copies are made from the recipes the loaded game has, so recipes of other mo
 
 ## Dark Fog recycling
 
-The drops of the Dark Fog can be broken down into raw materials on the "Recycling" tab, in an assembler (energy shards in a chemical plant):
+The drops of the Dark Fog turn into finished items on the "Recycling" tab. Every drop has more than one choice:
 
-| Drop | Gives |
+| Drop | Makes |
 |---|---|
-| 1 Dark Fog Matrix | 4 iron ore, 4 copper ore |
-| 1 Silicon-based Neuron | 6 silicon ore, 1 fractal silicon |
-| 1 Matter Recombinator | 6 titanium ore, 1 optical grating crystal |
-| 1 Negentropy Singularity | 4 unipolar magnets, 2 spiniform stalagmite crystals |
-| 1 Core Element | 4 kimberlite ore, 4 fire ice |
-| 10 Energy Shards | 6 hydrogen, 2 deuterium |
+| Dark Fog Matrix | magazines; matrices I-III |
+| Silicon-based Neuron | explosive units; combat units |
+| Matter Recombinator | shells; Dyson sphere parts (sail, frame, component, rocket, EM rail ejector, vertical launching silo); top assembler, top smelter and jammer tower |
+| Negentropy Singularity | missiles; matrices IV-VI; power facilities IV-VI |
+| Core Element | plasma and antimatter capsules; fuel rods IV-VI; power facilities I-III |
+| 10 Energy Shards | jamming capsules; fuel rods I-III |
 
-A product the loaded game does not have is left out of its recipe. Works with any Dark Fog settings, including BUG_DarkFogTuner's.
+The groups come from the loaded game, so GenesisBook's extra rounds, matrices and fuel rods are part of them. Every group but the ammunition runs from the cheapest item to the dearest; a group of more than six items is split in two, each half from its own drop. Power facilities are the accumulator, geothermal and fusion plants, ray receiver, artificial stars and (with GenesisBook) the isotope generator.
+
+Every group comes in levels (up to three per half), each a technology of its own, and each level makes items of its own: level I the simplest, the last level the hardest. A round that stands apart from its group in the item grid joins the group's last level.
+
+A recipe is worth about what its drops are worth. Every item costs the raw materials of the game's own recipes (an ore, a stone or a water count 1), and each drop has a fixed worth in the same units: Energy Shard 3, Dark Fog Matrix 20, Silicon-based Neuron 25, Matter Recombinator 30, Negentropy Singularity 40, Core Element 60. A level takes as many drops as its hardest item needs and gives the cheaper items in matching numbers. With GenesisBook one Dark Fog Matrix makes 10 machine-gun and 3 steel-core magazines, while a vertical launching silo with six rockets takes 193 Matter Recombinators.
+
+Each recipe runs in the building the game uses for its hardest item, so the levels spread over the assemblers, GenesisBook's other assembly buildings and, for matrices, the matrix lab.
+
+Each level opens after the previous one and after the technology that unlocks its hardest item, so nothing is made before it is researched. The first levels follow Dark Fog Recycling. Works with any Dark Fog settings, including BUG_DarkFogTuner's.
 
 ## Research
 
-Four technologies on the main tech page, in a row under the lowest one: Ore Crushing, then Ore Enrichment I, II and III. Each also needs the technology that gives its additives (water pump, hydrogen, sulfuric acid, interstellar logistics). A second row holds Catalysis I to V; each needs the technology that gives its catalyst. A third row holds Precious Metal Recovery (after sulfuric acid), Gold and Silver Electronics and Gold and Silver Construction (both after processors) and, with GenesisBook, Fluid Chemistry. Dark Fog Recycling follows them on the same row, after Ore Crushing.
+Four technologies on the main tech page, in a row under the lowest one: Ore Crushing, then Ore Enrichment I, II and III. Each also needs the technology that gives its additives (water pump, hydrogen, sulfuric acid, interstellar logistics). A second row holds Catalysis I to V; each needs the technology that gives its catalyst. A third row holds Precious Metal Recovery (after sulfuric acid), Gold and Silver Electronics and Gold and Silver Construction (both after processors) and, with GenesisBook, Fluid Chemistry. Dark Fog Recycling follows them on the same row, after Ore Crushing; its levels sit on five rows under it, three groups side by side.
 
 In the vanilla game each technology costs one more kind of matrix than the one before it (100, 200, 400 ... of each). On a changed tech tree with its own matrices, each technology costs what the technology it waits for costs.
 

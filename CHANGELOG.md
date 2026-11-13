@@ -2,7 +2,7 @@
 
 ## 1.1.0
 
-- Dark Fog recycling: the six Dark Fog drops break down into ores, rare minerals, hydrogen and deuterium on a new "Recycling" tab, under the Dark Fog Recycling technology.
+- Dark Fog recycling on a new "Recycling" tab: the six Dark Fog drops make ammunition, matrices, fuel rods, Dyson sphere parts, combat units and a few buildings, in levels from the simplest items to the hardest, several items per recipe, each recipe worth about what its drops are worth and made in the building the game uses for its hardest item; each level is a technology after the one that unlocks its hardest item.
 - The mod's tabs stay hidden in the replicator until one of their recipes is researched, and tabs without items no longer appear in the item filter, so its buttons fit the window.
 
 ## 1.0.0
