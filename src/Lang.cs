@@ -19,7 +19,29 @@ namespace OreEnrichment
             ["Coal"] = new[] { "煤", "Kömür" },
             ["Silicon"] = new[] { "硅", "Silisyum" },
             ["Titanium"] = new[] { "钛", "Titanyum" },
+            ["Aluminium"] = new[] { "铝", "Alüminyum" },
+            ["Niobium"] = new[] { "铌", "Niyobyum" },
+            ["Kimberlite"] = new[] { "金伯利矿", "Kimberlit" },
+            ["Fractal Silicon"] = new[] { "分形硅石", "Fraktal Silisyum" },
+            ["Fire Ice"] = new[] { "可燃冰", "Ateş Buzu" },
+            ["Spiniform"] = new[] { "刺笋结晶", "Dikenli Kristal" },
+            ["Unipolar Magnet"] = new[] { "单极磁石", "Tek Kutuplu Mıknatıs" },
             ["{0} Dust"] = new[] { "{0}粉", "{0} Tozu" },
+            ["Crushed {0}: 1 per ore from crushing, 3 per 2 ore from washing. Smelted with an additive it gives 1.5 or 2 times what the ore gives in its normal recipe (Ore Enrichment I and II)."] = new[]
+            {
+                "粉碎的{0}：粉碎每 1 矿得 1 粉，水洗每 2 矿得 3 粉。加入添加剂冶炼时，产量为该矿普通配方的 1.5 或 2 倍（矿物富集 I 和 II）。",
+                "Öğütülmüş {0}: öğütmede cevher başına 1, yıkamada 2 cevherden 3 toz. Katkı maddesiyle eritildiğinde cevherin normal tarifinin 1.5 veya 2 katını verir (Cevher Zenginleştirme I-II).",
+            },
+            ["1 ore gives 1 dust.\nSmelted with an additive, dust gives 1.5 or 2 times what the ore gives in its normal recipe (Ore Enrichment I and II).\nWashing instead of crushing gives 1.5 times as much dust."] = new[]
+            {
+                "1 份矿石得 1 份矿粉。\n加入添加剂冶炼时，矿粉的产量为矿石普通配方的 1.5 或 2 倍（矿物富集 I 和 II）。\n改用水洗可得 1.5 倍的矿粉。",
+                "1 cevher 1 toz verir.\nKatkı maddesiyle eritilen toz, cevherin normal tarifinin 1.5 veya 2 katını verir (Cevher Zenginleştirme I-II).\nÖğütmek yerine yıkamak 1.5 kat toz verir.",
+            },
+            ["2 ore and 1 water give 3 dust: 1.5 times the dust of crushing.\nThis multiplies with Ore Enrichment: washed dust ends up as 2.25 or 3 times what the ore gives in its normal recipe."] = new[]
+            {
+                "2 份矿石加 1 份水得 3 份矿粉：是粉碎的 1.5 倍。\n这与矿物富集相乘：水洗矿粉最终为矿石普通配方的 2.25 或 3 倍。",
+                "2 cevher ve 1 su 3 toz verir: öğütmenin 1.5 katı.\nBu, Cevher Zenginleştirme ile çarpılır: yıkanmış toz, cevherin normal tarifinin 2.25 veya 3 katına ulaşır.",
+            },
             ["{0} Ore Crushing"] = new[] { "{0}矿粉碎", "{0} Cevheri Öğütme" },
             ["{0} Ore Washing"] = new[] { "{0}矿水洗", "{0} Cevheri Yıkama" },
             ["Crushed {0} ore: 1 per ore from crushing, 3 per 2 ore from washing. Smelted with an additive it gives 1.5, 2 or 3 times what the ore gives in its normal recipe (Ore Enrichment I to III)."] = new[]
@@ -127,6 +149,7 @@ namespace OreEnrichment
             ["Silver Smelting"] = new[] { "银冶炼", "Gümüş Eritme" },
             ["Nitric Acid Parting"] = new[] { "硝酸分金", "Nitrik Asitle Ayrıştırma" },
             ["Wohlwill Gold Refining"] = new[] { "沃威尔金精炼", "Wohlwill Altın Arıtma" },
+            ["Moebius Silver Refining"] = new[] { "默比乌斯银精炼", "Moebius Gümüş Arıtma" },
             ["{0} Ore Seawater Washing"] = new[] { "{0}矿海水冲洗", "{0} Cevheri Deniz Suyuyla Yıkama" },
             ["Copper dust refined in sulfuric acid gives as much copper as smelting, and anode slime besides."] = new[] { "在硫酸中精炼铜粉，得到的铜与冶炼相同，另得阳极泥。", "Sülfürik asitte arıtılan bakır tozu, eritmeyle aynı miktarda bakır ve ayrıca anot çamuru verir." },
             ["Sulfuric acid dissolves the copper left in the slime; gold and silver stay behind as dust."] = new[] { "硫酸溶解阳极泥中残留的铜，金和银以粉末形式留下。", "Sülfürik asit çamurdaki bakırı çözer; altın ve gümüş toz olarak geride kalır." },
@@ -134,6 +157,7 @@ namespace OreEnrichment
             ["Silver dust smelted into ingots."] = new[] { "把银粉冶炼成锭。", "Gümüş tozu külçeye eritilir." },
             ["Nitric acid parts silver from gold: more of both from the same slime than sulfuric acid gives."] = new[] { "硝酸把银从金中分离：同样的阳极泥得到的金银都比硫酸多。", "Nitrik asit gümüşü altından ayırır: aynı çamurdan sülfürik asitten daha fazla altın ve gümüş." },
             ["Gold dust refined by electrolysis in hydrochloric acid: three ingots from two dust."] = new[] { "在盐酸中电解精炼金粉：两份金粉得三块金锭。", "Altın tozu hidroklorik asitte elektrolizle arıtılır: iki tozdan üç külçe." },
+            ["Silver dust refined by electrolysis in a silver nitrate bath: three ingots from two dust."] = new[] { "在硝酸银溶液中电解精炼银粉：两份银粉得三块银锭。", "Gümüş tozu gümüş nitrat banyosunda elektrolizle arıtılır: iki tozdan üç külçe." },
             ["Washing with seawater gives as much dust as washing with water, and salt besides."] = new[] { "用海水冲洗得到的矿粉与用水冲洗相同，另得盐。", "Deniz suyuyla yıkama, suyla yıkama kadar toz ve ayrıca tuz verir." },
             [" (Dust)"] = new[] { "（金属粉）", " (Toz)" },
             [" (Ingot)"] = new[] { "（金属锭）", " (Külçe)" },

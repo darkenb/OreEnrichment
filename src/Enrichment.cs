@@ -9,9 +9,9 @@ using CommonAPI.Systems;
 using HarmonyLib;
 using UnityEngine;
 
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
-[assembly: AssemblyInformationalVersion("1.1.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyInformationalVersion("1.2.0")]
 
 namespace OreEnrichment
 {
@@ -36,13 +36,26 @@ namespace OreEnrichment
         public const int Smelt = 1, Chemical = 2, Refine = 3, Assemble = 4, Particle = 5;  // ERecipeType
         public const int Water = 1000, Hydrogen = 1120, Acid = 1116, Oil = 1114, Graphite = 1109, FireIce = 1011, Organic = 1117, Unipolar = 1016, Fractal = 1013, Kimberlite = 1012, Grating = 1014, Spiniform = 1015;
         public const int Iron = 0, Copper = 1, Stone = 2, Coal = 3, Silicon = 4, Titanium = 5;
+        public const int Aluminium = 6, Niobium = 7, KimberliteOre = 8, FractalOre = 9, FireIceOre = 10, SpiniformOre = 11, UnipolarOre = 12;
         public const int DustBase = 9451, CrushBase = 9501, WashBase = 9511, EnrichBase = 9521;
+        // Ores added in 1.2.0 take free ids after the first ones (9457-9461 are gold and silver, 9480+ MoreMegaStructure).
+        public const int BaseOres = 6, MoreDustBase = 9462, MoreCrushBase = 9548, MoreWashBase = 9555, MoreEnrichBase = 9562;
+        public const int GenesisOnly = 2;  // aluminium and niobium exist only with GenesisBook
 
-        public static readonly int[] Ores = { 1001, 1002, 1005, 1006, 1003, 1004 };
-        public static readonly string[] OreNames = { "Iron", "Copper", "Stone", "Coal", "Silicon", "Titanium" };
-        public static readonly string[] Icons = { "iron-dust", "copper-dust", "stone-dust", "coal-dust", "silicon-dust", "titanium-dust" };
+        public static readonly int[] Ores = { 1001, 1002, 1005, 1006, 1003, 1004, 6202, 6201, Kimberlite, Fractal, FireIce, Spiniform, Unipolar };
+        public static readonly string[] OreNames = { "Iron", "Copper", "Stone", "Coal", "Silicon", "Titanium", "Aluminium", "Niobium", "Kimberlite", "Fractal Silicon", "Fire Ice", "Spiniform", "Unipolar Magnet" };
+        public static readonly string[] Icons = { "iron-dust", "copper-dust", "stone-dust", "coal-dust", "silicon-dust", "titanium-dust",
+            "aluminium-dust", "niobium-dust", "kimberlite-dust", "fractal-dust", "fire-ice-dust", "spiniform-dust", "unipolar-dust" };
 
-        public static int Dust(int ore) => DustBase + ore;
+        public static int Dust(int ore) => ore < BaseOres ? DustBase + ore : MoreDustBase + ore - BaseOres;
+        public static bool Rare(int ore) => ore >= KimberliteOre;  // rare veins: two tiers only, and their own rows
+        public static bool Exists(int ore, bool genesis) => genesis || ore < Aluminium || ore >= Aluminium + GenesisOnly;
+        // Index of the ore a dust is made from, or -1.
+        public static int OreOf(int item)
+        {
+            for (int o = 0; o < Ores.Length; o++) if (Dust(o) == item) return o;
+            return -1;
+        }
 
         // Batches of the vanilla recipe that go in, and products that come out, per tier.
         public static readonly int[] TierIn = { 4, 4, 4 }, TierOut = { 6, 8, 12 };
@@ -50,10 +63,13 @@ namespace OreEnrichment
         // Plentiful additives: tier 1 takes two of them per batch, everything else one.
         public static bool Plentiful(int item) => item == Hydrogen || item == Water || (item >= DustBase && item < DustBase + 6);
         public static readonly string[] TierNames = { "Enriched I", "Enriched II", "Enriched III" };
-        static readonly string[] ProductNames = { "Iron Ingot", "Magnet", "Copper Ingot", "Stone Brick", "Glass", "Energetic Graphite", "High-Purity Silicon", "Titanium Ingot", "Steel" };
+        static readonly string[] ProductNames = { "Iron Ingot", "Magnet", "Copper Ingot", "Stone Brick", "Glass", "Energetic Graphite", "High-Purity Silicon", "Titanium Ingot", "Steel",
+            "Aluminium Ingot", "Niobium Ingot", "Diamond", "Crystal Silicon", "Graphene", "Carbon Nanotube", "Particle Container" };
+        public const int RareCol = 8;  // rare-vein tiers sit in rows 6-7 right of the fluid and seawater recipes
+        public const int NaOH = 7020, HCl = 7014;
 
         // GenesisBook's building types; used only while a building of that type exists.
-        public const int GbFurnace = 11, GbPlasmaFurnace = 13, GbPolymer = 16;
+        public const int GbFurnace = 11, GbPlasmaFurnace = 13, GbPolymer = 16, GbPrecision = 9;
 
         // product, main input, main input per product (as vanilla), vanilla ticks per product; additives of tier 1 / 2 / 3;
         // building type per tier; building type per tier with GenesisBook (0: the same)
@@ -77,6 +93,21 @@ namespace OreEnrichment
                 new[] { Chemical, Chemical, Smelt }, new[] { 0, 0, GbPlasmaFurnace } },
             new[] { new[] { 1103, 1101, 3, 180 }, new[] { Dust(Coal) }, new[] { Graphite }, new[] { Kimberlite },                           // steel, from iron ingots
                 new[] { Smelt, Smelt, Smelt }, new[] { 0, GbFurnace, GbPlasmaFurnace } },
+            new[] { new[] { 6203, Dust(Aluminium), 1, 60 }, new[] { Dust(Coal) }, new[] { NaOH }, new[] { Acid },                           // aluminium ingot: Bayer process
+                new[] { Smelt, Chemical, Chemical }, new[] { 0, 0, 0 } },
+            new[] { new[] { 7705, Dust(Niobium), 1, 60 }, new[] { Hydrogen }, new[] { HCl }, new[] { Acid },                                // niobium ingot
+                new[] { Smelt, Chemical, Chemical }, new[] { GbPlasmaFurnace, 0, 0 } },
+            // Rare veins: tiers I and II only (null: no tier III).
+            new[] { new[] { 1112, Dust(KimberliteOre), 1, 45 }, new[] { Hydrogen }, new[] { Graphite }, null,                             // diamond
+                new[] { Smelt, Smelt, 0 }, new[] { GbFurnace, GbFurnace, 0 } },
+            new[] { new[] { 1113, Dust(FractalOre), 1, 45 }, new[] { Dust(Silicon) }, new[] { Hydrogen }, null,                           // crystal silicon
+                new[] { Smelt, Smelt, 0 }, new[] { GbFurnace, GbFurnace, 0 } },
+            new[] { new[] { 1123, Dust(FireIceOre), 1, 60 }, new[] { Water }, new[] { Acid }, null,                                       // graphene
+                new[] { Chemical, Chemical, 0 }, new[] { 0, 0, 0 } },
+            new[] { new[] { 1124, Dust(SpiniformOre), 1, 120 }, new[] { Hydrogen }, new[] { Acid }, null,                                 // carbon nanotube
+                new[] { Chemical, Chemical, 0 }, new[] { 0, 0, 0 } },
+            new[] { new[] { 1206, Dust(UnipolarOre), 6, 120 }, new[] { Dust(Iron) }, new[] { Graphite }, null,                            // particle container; the normal
+                new[] { Assemble, Assemble, 0 }, new[] { GbPrecision, GbPrecision, 0 } },                                                 // recipe's other inputs join in Adapt
         };
 
         public const double WashGain = 1.5;  // 2 ore -> 3 dust
@@ -87,12 +118,16 @@ namespace OreEnrichment
         {
             var inv = System.Globalization.CultureInfo.InvariantCulture;
             if (a.Tech == 0)
-                return Lang.T(a.In.Length == 1
+                return Lang.T(a.In.Length == 1 && Rare(a.Col - 1)
+                    ? "1 ore gives 1 dust.\nSmelted with an additive, dust gives 1.5 or 2 times what the ore gives in its normal recipe (Ore Enrichment I and II).\nWashing instead of crushing gives 1.5 times as much dust."
+                    : a.In.Length == 1
                     ? "1 ore gives 1 dust.\nSmelted with an additive, dust gives 1.5, 2 or 3 times what the ore gives in its normal recipe (Ore Enrichment I to III).\nWashing instead of crushing gives 1.5 times as much dust."
+                    : Rare(a.Col - 1)
+                    ? "2 ore and 1 water give 3 dust: 1.5 times the dust of crushing.\nThis multiplies with Ore Enrichment: washed dust ends up as 2.25 or 3 times what the ore gives in its normal recipe."
                     : "2 ore and 1 water give 3 dust: 1.5 times the dust of crushing.\nThis multiplies with Ore Enrichment: washed dust ends up as 2.25, 3 or 4.5 times what the ore gives in its normal recipe.");
             int normal = a.Normal;
             double gain = (double)a.OutN[0] / normal;
-            bool fromDust = a.In[0] >= DustBase && a.In[0] < DustBase + Ores.Length;
+            bool fromDust = OreOf(a.In[0]) >= 0;
             var text = new System.Text.StringBuilder();
             text.Append(Lang.F(fromDust ? "{0} {1} from {2} {3}. The normal recipe makes {4} from the same ore." : "{0} {1} from {2} {3}. The normal recipe makes {4} from the same amount.",
                 a.OutN[0], name(a.Out[0]), a.InN[0], name(a.In[0]), normal));
@@ -104,46 +139,55 @@ namespace OreEnrichment
             return text.ToString();
         }
 
-        public static List<Alt> All()
+        // genesis: GenesisBook is loaded; without it ores that do not exist get no recipes.
+        public static List<Alt> All(bool genesis = true)
         {
             var all = new List<Alt>();
             for (int o = 0; o < Ores.Length; o++)
             {
-                all.Add(new Alt { Id = CrushBase + o, Type = Assemble, Time = 30, Row = 1, Col = o + 1, Tech = 0, Handcraft = true, Name = OreNames[o] + " Ore Crushing",
+                if (!Exists(o, genesis)) continue;
+                all.Add(new Alt { Id = o < BaseOres ? CrushBase + o : MoreCrushBase + o - BaseOres, Type = Assemble, Time = 30, Row = 1, Col = o + 1, Tech = 0, Handcraft = true, Name = OreNames[o] + " Ore Crushing",
                     In = new[] { Ores[o] }, InN = new[] { 1 }, Out = new[] { Dust(o) }, OutN = new[] { 1 } });
-                all.Add(new Alt { Id = WashBase + o, Type = Chemical, Time = 90, Row = 2, Col = o + 1, Tech = 0, Name = OreNames[o] + " Ore Washing",
+                all.Add(new Alt { Id = o < BaseOres ? WashBase + o : MoreWashBase + o - BaseOres, Type = Chemical, Time = 90, Row = 2, Col = o + 1, Tech = 0, Name = OreNames[o] + " Ore Washing",
                     In = new[] { Ores[o], Water }, InN = new[] { 2, 1 }, Out = new[] { Dust(o) }, OutN = new[] { 3 } });
             }
             for (int p = 0; p < Products.Length; p++)
                 for (int t = 0; t < 3; t++)
                 {
                     int[] head = Products[p][0], add = Products[p][t + 1];
+                    int ore = OreOf(head[1]);
+                    if (add == null || ore >= 0 && !Exists(ore, genesis)) continue;
+                    bool rare = ore >= 0 && Rare(ore);
                     var input = new List<int> { head[1] };
                     var counts = new List<int> { head[2] * TierIn[t] };
                     foreach (int a in add) { input.Add(a); counts.Add(t == 0 && Plentiful(a) ? 2 : 1); }
-                    all.Add(new Alt { Id = EnrichBase + p * 3 + t, Type = Products[p][4][t], GbType = Products[p][5][t], Time = head[3] * TierOut[t], Row = 3 + t, Col = p + 1, Tech = t + 1, Name = ProductNames[p] + " (" + TierNames[t] + ")", Tier = TierNames[t], Normal = TierIn[t],
+                    all.Add(new Alt { Id = p < 9 ? EnrichBase + p * 3 + t : MoreEnrichBase + (p - 9) * 3 + t, Type = Products[p][4][t], GbType = Products[p][5][t], Time = head[3] * TierOut[t],
+                        Row = (rare ? 6 : 3) + t, Col = rare ? RareCol + p - 11 : p + 1, Tech = t + 1, Name = ProductNames[p] + " (" + TierNames[t] + ")", Tier = TierNames[t], Normal = TierIn[t],
                         In = input.ToArray(), InN = counts.ToArray(), Out = new[] { head[0] }, OutN = new[] { TierOut[t] } });
                 }
             return all;
         }
     }
 
-    [BepInPlugin(Guid, "BUG_OreEnrichment", "1.1.0")]
+    [BepInPlugin(Guid, "BUG_OreEnrichment", "1.2.0")]
     [BepInDependency(CommonAPIPlugin.GUID)]
     [BepInDependency("me.xiaoye97.plugin.Dyson.LDBTool")]
+    [BepInDependency(GenesisGuid, BepInDependency.DependencyFlags.SoftDependency)]  // loaded first, so Awake can see it
     [CommonAPISubmoduleDependency(nameof(ProtoRegistry), nameof(TabSystem))]
     public class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "bug.dsp.oreenrichment", IconRoot = "BUGOreEnrichment/";
+        public const string Guid = "bug.dsp.oreenrichment", IconRoot = "BUGOreEnrichment/", GenesisGuid = "org.LoShin.GenesisBook";
         public const int TechBase = 1971;  // main tech page needs ids below 2000; GenesisBook ends at 1963
         internal static ManualLogSource Log;
         static readonly List<RecipeProto> recipes = new List<RecipeProto>();
-        static readonly List<Alt> alts = Tables.All();
+        static List<Alt> alts;
         static bool techsBuilt;
 
         void Awake()
         {
             Log = Logger;
+            bool genesis = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(GenesisGuid);
+            alts = Tables.All(genesis);
             var harmony = new Harmony(Guid);
             harmony.PatchAll(typeof(Plugin));
             harmony.PatchAll(typeof(Catalysis));
@@ -157,8 +201,9 @@ namespace OreEnrichment
                 catalysisTabs = new[] { TabSystem.RegisterTab(Guid + ":cat1", new TabData(Lang.T("Catalysis"), IconRoot + "tab-cat")),
                     TabSystem.RegisterTab(Guid + ":cat2", new TabData(Lang.T("Catalysis II"), IconRoot + "tab-cat")) };
                 for (int o = 0; o < Tables.Ores.Length; o++)
+                    if (Tables.Exists(o, genesis))
                     ProtoRegistry.RegisterItem(Tables.Dust(o), Lang.F("{0} Dust", Lang.T(Tables.OreNames[o])),
-                        Lang.F("Crushed {0} ore: 1 per ore from crushing, 3 per 2 ore from washing. Smelted with an additive it gives 1.5, 2 or 3 times what the ore gives in its normal recipe (Ore Enrichment I to III).", Lang.T(Tables.OreNames[o])),
+                        Lang.F(Tables.Rare(o) ? "Crushed {0}: 1 per ore from crushing, 3 per 2 ore from washing. Smelted with an additive it gives 1.5 or 2 times what the ore gives in its normal recipe (Ore Enrichment I and II)." : "Crushed {0} ore: 1 per ore from crushing, 3 per 2 ore from washing. Smelted with an additive it gives 1.5, 2 or 3 times what the ore gives in its normal recipe (Ore Enrichment I to III).", Lang.T(Tables.OreNames[o])),
                         IconRoot + Tables.Icons[o], ProtoRegistry.GetGridIndex(tab, o + 1, 1), 100, EItemType.Material).Productive = true;
                 preciousTab = TabSystem.RegisterTab(Guid + ":precious", new TabData("Au-Ag", IconRoot + "tab-precious"));
                 preciousTab2 = TabSystem.RegisterTab(Guid + ":precious2", new TabData("Au-Ag II", IconRoot + "tab-precious"));
@@ -350,10 +395,15 @@ namespace OreEnrichment
             {
                 var a = alts[i];
                 if (a.Tech == 0) continue;
-                int source = a.In[0] >= Tables.DustBase && a.In[0] < Tables.DustBase + Tables.Ores.Length ? Tables.Ores[a.In[0] - Tables.DustBase] : a.In[0];
-                RecipeProto normal = null;
+                int ore = Tables.OreOf(a.In[0]), source = ore >= 0 ? Tables.Ores[ore] : a.In[0];
+                RecipeProto normal = null, shared = null;  // shared: the ore is one of several inputs (particle container)
                 foreach (var c in LDB.recipes.dataArray)
-                    if (c != null && !mine.Contains(c.ID) && c.Items.Length == 1 && c.Items[0] == source && c.Results.Length == 1 && c.Results[0] == a.Out[0]) { normal = c; break; }
+                    if (c != null && !mine.Contains(c.ID) && c.Results.Length == 1 && c.Results[0] == a.Out[0] && Array.IndexOf(c.Items, source) >= 0)
+                    {
+                        if (c.Items.Length == 1) { normal = c; break; }
+                        if (shared == null) shared = c;
+                    }
+                normal = normal ?? (a.Id >= Tables.MoreEnrichBase ? shared : null);
                 var r = recipes[i];
                 if (normal == null)
                 {
@@ -362,10 +412,21 @@ namespace OreEnrichment
                     hidden++;
                     continue;
                 }
-                int inN = Tables.TierIn[a.Tech - 1] * normal.ItemCounts[0], outN = Tables.TierOut[a.Tech - 1] * normal.ResultCounts[0];
+                int main = Array.IndexOf(normal.Items, source), batches = Tables.TierIn[a.Tech - 1];
+                int inN = batches * normal.ItemCounts[main], outN = Tables.TierOut[a.Tech - 1] * normal.ResultCounts[0];
                 int time = normal.TimeSpend * Tables.TierOut[a.Tech - 1];
                 if (inN != a.InN[0] || outN != a.OutN[0] || time != a.Time) changed++;
-                normals.Add(normal.ID);
+                if (normal.Items.Length > 1)
+                {
+                    // The normal recipe's other inputs come along, as many batches of them as of the ore.
+                    var items = new List<int>(a.In);
+                    var counts = new List<int>(a.InN);
+                    for (int k = 0; k < normal.Items.Length; k++)
+                        if (k != main) { items.Add(normal.Items[k]); counts.Add(batches * normal.ItemCounts[k]); }
+                    a.In = r.Items = items.ToArray();
+                    a.InN = r.ItemCounts = counts.ToArray();
+                }
+                if (a.Id < Tables.MoreEnrichBase) normals.Add(normal.ID);  // later products keep their catalysed copies, which saves may use
                 a.Normal = Tables.TierIn[a.Tech - 1] * normal.ResultCounts[0];
                 a.Time = r.TimeSpend = time;
                 r.ItemCounts[0] = a.InN[0] = inN;
@@ -373,11 +434,12 @@ namespace OreEnrichment
             }
             // Products left out leave no empty column.
             var column = new Dictionary<int, int>();
+            int[] next = { 1, Tables.RareCol };  // rows 3-5, rows 6-7
             for (int i = 0; i < alts.Count; i++)
             {
                 var a = alts[i];
                 if (a.Tech == 0 || a.Row == 0) continue;
-                if (!column.TryGetValue(a.Out[0], out int col)) column[a.Out[0]] = col = column.Count + 1;
+                if (!column.TryGetValue(a.Out[0], out int col)) column[a.Out[0]] = col = next[a.Row >= 6 ? 1 : 0]++;
                 a.Col = col;
                 recipes[i].GridIndex = ProtoRegistry.GetGridIndex(tabIndex, col, a.Row);
             }

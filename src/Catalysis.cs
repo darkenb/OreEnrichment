@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace OreEnrichment
 {
-    // A catalysed copy of every other productive recipe the loaded game has, vanilla or modded: three batches of the
-    // inputs and one catalyst give four batches of the products. The copy runs in the same building as its original.
-    // Buildings, recipes the game bars from extra products, and anything that would close a production loop get none.
+    // A catalysed copy of every other recipe the loaded game has, vanilla or modded: three batches of the inputs and one
+    // catalyst give four batches of the products. The copy runs in the same building as its original. Buildings that have
+    // a gold or silver copy get none, and neither does a copy that could run on its own products with nothing from outside.
     public static class Catalysis
     {
         public const int IdBase = 10000, MaxSourceId = 1999;  // copy id = IdBase + original id; the game's icon table ends at 12000
-        public const int TechBase = 1975, Batches = 3, Gain = 4, CellsPerTab = 14 * 7;
+        public const int TechBase = 1975, Batches = 3, Gain = 4, CellsPerTab = 14 * 7;  // tabs: Plugin.catalysisTabs
         public static readonly int[] Catalysts = { 1114, 1120, 1123, 1124, 1127 };  // refined oil, hydrogen, graphene, carbon nanotube, strange matter
 
         static readonly string[] TechNames = { "Catalysis I", "Catalysis II", "Catalysis III", "Catalysis IV", "Catalysis V" };
@@ -29,6 +30,30 @@ namespace OreEnrichment
             counts2[items.Length] = 1;
             resultCounts2 = new int[resultCounts.Length];
             for (int i = 0; i < resultCounts.Length; i++) resultCounts2[i] = resultCounts[i] * Gain;
+        }
+
+        // Items made by the recipes that can all keep running with nothing from outside: the largest set of recipes whose
+        // every input is a product of the set. A copy is a free source of products only if its inputs, the catalyst too,
+        // all come from there; any other loop it closes still eats ore. recipes: (inputs, products).
+        public static HashSet<int> SelfSustaining(IEnumerable<KeyValuePair<int[], int[]>> recipes)
+        {
+            var live = new List<KeyValuePair<int[], int[]>>();
+            foreach (var r in recipes) if (r.Key != null && r.Key.Length > 0 && r.Value != null) live.Add(r);
+            while (true)
+            {
+                var made = new HashSet<int>();
+                foreach (var r in live) foreach (int o in r.Value) made.Add(o);
+                int before = live.Count;
+                live.RemoveAll(r => Array.Exists(r.Key, i => !made.Contains(i)));
+                if (live.Count == before) return made;
+            }
+        }
+
+        // Catalyst stages to try: the recipe's own stage, then simpler ones, then harder ones.
+        public static IEnumerable<int> CatalystOrder(int stage)
+        {
+            for (int k = stage; k >= 0; k--) yield return k;
+            for (int k = stage + 1; k < Catalysts.Length; k++) yield return k;
         }
 
         // True when something made (directly or through any chain of recipes) from `from` is one of `targets`.
@@ -190,25 +215,23 @@ namespace OreEnrichment
                 deepest = Math.Max(deepest, d);
                 foreach (int id in t.UnlockRecipes) depth[id] = depth.TryGetValue(id, out int had) ? Math.Min(had, d) : d;
             }
-            var makes = new Dictionary<int, HashSet<int>>();
-            void Edge(int from, int[] to)
-            {
-                if (!makes.TryGetValue(from, out var set)) makes[from] = set = new HashSet<int>();
-                foreach (int r in to) set.Add(r);
-            }
-            foreach (var r in LDB.recipes.dataArray)
-                if (r?.Items != null && r.Results != null) foreach (int item in r.Items) Edge(item, r.Results);
+            // A copy has the products of its original and one input more, so accepted copies never grow this set.
+            var free = SelfSustaining(LDB.recipes.dataArray.Where(r => r?.Items != null).Select(r => new KeyValuePair<int[], int[]>(r.Items, r.Results)));
 
             var originals = new List<RecipeProto>();
             foreach (var r in LDB.recipes.dataArray)
             {
-                if (r == null || skip.Contains(r.ID) || r.ID > MaxSourceId || r.GridIndex < 1101 || r.NonProductive || !r.productive) continue;
+                if (r == null || skip.Contains(r.ID) || r.ID > MaxSourceId || r.GridIndex < 1101) continue;
                 if (r.Items == null || r.Items.Length == 0 || r.Results == null || r.Results.Length == 0) continue;
                 if (r.Items.Length + r.Results.Length + 1 > Precious.MaxIcons) continue;   // the catalyst would not show in recipe lists
                 if (r.Type == ERecipeType.Fractionate || r.Type == ERecipeType.Exchange || r.Type == ERecipeType.PhotonStore || r.Type == ERecipeType.None) continue;
-                bool building = false;
-                foreach (int id in r.Results) { var item = LDB.items.Select(id); building |= item == null || item.CanBuild; }
-                if (!building) originals.Add(r);
+                bool building = false, unknown = false;
+                foreach (int id in r.Results) { var item = LDB.items.Select(id); unknown |= item == null; building |= item != null && item.CanBuild; }
+                if (unknown) continue;
+                // Buildings: those without a gold or silver copy, listed in a replicator row, and not a one-item quick assembly.
+                int row = r.GridIndex % 1000 / 100;
+                if (building && (LDB.recipes.Exist(Precious.RuleBase + r.ID) || r.Items.Length < 2 || row < 1 || row > 8 || r.GridIndex % 100 == 0)) continue;
+                originals.Add(r);
             }
             originals.Sort((a, b) => a.GridIndex != b.GridIndex ? a.GridIndex.CompareTo(b.GridIndex) : a.ID.CompareTo(b.ID));
 
@@ -219,14 +242,17 @@ namespace OreEnrichment
             foreach (var r in originals)
             {
                 int stage = Stage(depth.TryGetValue(r.ID, out int d) ? d : 0, deepest), catalyst = 0;
-                for (int k = stage; k >= 0 && catalyst == 0; k--)
+                foreach (int k in CatalystOrder(stage))
                 {
                     var item = LDB.items.Select(Catalysts[k]);
-                    if (item != null && item.GridIndex > 0 && Array.IndexOf(r.Items, item.ID) < 0 && Array.IndexOf(r.Results, item.ID) < 0) catalyst = item.ID;
+                    if (item == null || item.GridIndex <= 0 || Array.IndexOf(r.Items, item.ID) >= 0 || Array.IndexOf(r.Results, item.ID) >= 0) continue;
+                    catalyst = item.ID;
+                    stage = Math.Max(stage, k);   // a harder catalyst waits for its own stage
+                    break;
                 }
                 if (catalyst == 0) { noCatalyst++; continue; }
                 Scale(r.Items, r.ItemCounts, r.ResultCounts, catalyst, out int[] items, out int[] counts, out int[] resultCounts);
-                if (Reaches(makes, r.Results, items)) { loops++; continue; }
+                if (Array.TrueForAll(items, free.Contains)) { loops++; continue; }
                 if (LDB.recipes.Exist(IdBase + r.ID)) { noRoom++; continue; }
                 if (added >= tabs.Length * CellsPerTab) { noRoom++; continue; }
 
@@ -249,11 +275,10 @@ namespace OreEnrichment
                     GridIndex = tabs[added / CellsPerTab] * 1000 + (added % CellsPerTab / 14 + 1) * 100 + added % 14 + 1,
                     IconPath = Plugin.IconRoot + "cat/" + r.ID,
                     IconTag = "",
-                    NonProductive = false,
+                    NonProductive = r.NonProductive,   // extra products stay barred where the game bars them
                 };
                 sources[r.ID] = r;
                 copies.Add(copy);
-                Edge(catalyst, r.Results);
                 unlocks[stage].Add(copy.ID);
                 added++;
             }
@@ -281,7 +306,7 @@ namespace OreEnrichment
                 int source = copy.ID - IdBase;
                 Mark(copy, () => IconFor(source), "badge-cat");
             }
-            Plugin.Log.LogInfo("Catalysed copies: " + added + " of " + originals.Count + " recipes (" + loops + " would close a loop, " + noCatalyst + " have no free catalyst, " + noRoom
+            Plugin.Log.LogInfo("Catalysed copies: " + added + " of " + originals.Count + " recipes (" + loops + " could run on their own products, " + noCatalyst + " have no free catalyst, " + noRoom
                 + " no free id or cell); per stage " + unlocks[0].Count + "/" + unlocks[1].Count + "/" + unlocks[2].Count + "/" + unlocks[3].Count + "/" + unlocks[4].Count + "; " + noIcon + " copies without icon");
         }
     }

@@ -10,7 +10,7 @@ More ingots from the same ore. Ores are crushed into dust, and dust smelted toge
 | Washing | Chemical plant | 2 ore + 1 water -> 3 dust |
 | Enriched smelting | Depends on the additive, see below | dust + additive -> more products |
 
-There are six dusts: iron, copper, stone, coal, silicon and titanium. All new recipes are on their own "Enrichment" tab.
+There are six common dusts (iron, copper, stone, coal, silicon, titanium), five rare-vein dusts (kimberlite, fractal silicon, fire ice, spiniform, unipolar magnet) and, with GenesisBook, aluminium and niobium dust. All new recipes are on their own "Enrichment" tab.
 
 ## Enriched smelting
 
@@ -27,6 +27,18 @@ Each tier is a separate recipe, measured against what the same ore gives in the 
 | High-purity silicon | Coal dust (smelter) | Energetic graphite (smelter) | Hydrogen + optical grating crystal (chemical plant) |
 | Titanium ingot | Sulfuric acid (chemical plant) | Sulfuric acid + coal dust (chemical plant) | Hydrogen + spiniform stalagmite crystal (smelter) |
 | Steel (from iron ingots) | Coal dust (smelter) | Energetic graphite (smelter) | Kimberlite ore (smelter) |
+| Aluminium ingot (GenesisBook) | Coal dust (smelter) | Sodium hydroxide (chemical plant) | Sulfuric acid (chemical plant) |
+| Niobium ingot (GenesisBook) | Hydrogen (smelter) | Hydrochloric acid (chemical plant) | Sulfuric acid (chemical plant) |
+
+Rare-vein dusts have two tiers, x1.5 and x2:
+
+| Product | From | Tier I | Tier II |
+|---|---|---|---|
+| Diamond | Kimberlite dust | Hydrogen (smelter) | Energetic graphite (smelter) |
+| Crystal silicon | Fractal silicon dust | Silicon dust (smelter) | Hydrogen (smelter) |
+| Graphene | Fire ice dust | Water (chemical plant) | Sulfuric acid (chemical plant) |
+| Carbon nanotube | Spiniform dust | Hydrogen (chemical plant) | Sulfuric acid (chemical plant) |
+| Particle container | Unipolar magnet dust, plus the other inputs of the normal recipe | Iron dust (assembler) | Energetic graphite (assembler) |
 
 The "Enrichment" tab only shows in a building that can run one of the recipes you have unlocked. Each recipe has its own icon: the product with a I, II or III badge, and a water drop for washing.
 
@@ -78,6 +90,7 @@ GenesisBook's fluids add a "Fluid Chemistry" technology:
 
 - Nitric acid parting: 2 anode slime + 1 nitric acid -> 2 gold dust + 3 silver dust.
 - Wohlwill gold refining: 2 gold dust + 1 hydrochloric acid -> 3 gold ingots.
+- Moebius silver refining: 2 silver dust + 1 nitric acid -> 3 silver ingots.
 - Fluid smelting of dust, 2.5 times the products of the ore (between tier II and tier III): steel with oxygen, copper with ammonia, titanium and silicon with hydrochloric acid, glass with sodium hydroxide, stone bricks with carbon dioxide.
 - Seawater washing: 4 ore + 2 seawater -> 6 dust + 1 salt.
 
@@ -85,13 +98,13 @@ Without GenesisBook these recipes and the technology do not exist.
 
 ## Catalysed recipes
 
-Every other recipe that makes a material, component, ammunition or matrix also gets a catalysed copy: three batches of the inputs and one catalyst give four batches of the products, a third more from the same materials. The copy runs in the same building as the normal recipe, so each assembler, smelter and chemical plant tier lists the copies of its own recipes on the "Catalysis" tabs.
+Every other recipe also gets a catalysed copy, fluid chemistry and particle collider recipes included: three batches of the inputs and one catalyst give four batches of the products, a third more from the same materials. The copy runs in the same building as the normal recipe, so each assembler, smelter and chemical plant tier lists the copies of its own recipes on the "Catalysis" tabs.
 
-The catalyst follows the research level of the normal recipe: refined oil, hydrogen, graphene, carbon nanotubes, strange matter. If the recipe already contains it, the next simpler one is used.
+The catalyst follows the research level of the normal recipe: refined oil, hydrogen, graphene, carbon nanotubes, strange matter. If the recipe already contains it, the next simpler one is used, or else the next harder one, and the copy then opens with that catalyst's stage.
 
 A catalysed recipe shows the icon of its normal recipe with a flask badge.
 
-The copies are made from the recipes the loaded game has, so recipes of other mods get them too. There are none for buildings, for recipes the game bars from extra products, and for any recipe whose copy would close a production loop.
+The copies are made from the recipes the loaded game has, so recipes of other mods get them too. Buildings get one when they have no gold or silver copy and take two or more materials. A copy of a recipe the game bars from extra products is barred from them too. A recipe whose copy could run on its own products with nothing from outside gets none; loops that still need ore, water or another outside input are allowed.
 
 ## Dark Fog recycling
 

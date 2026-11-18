@@ -54,9 +54,12 @@ namespace OreEnrichment
                     In = new[] { Slime, Nitric }, InN = new[] { 2, 1 }, Out = new[] { GoldDust, SilverDust }, OutN = new[] { 2, 3 } },
                 new Alt { Id = ChainBase + 5, Type = Tables.Chemical, Time = 180, Row = 1, Col = 6, Tech = 3, Name = "Wohlwill Gold Refining", Badge = "badge-fluid",
                     In = new[] { GoldDust, HCl }, InN = new[] { 2, 1 }, Out = new[] { GoldIngot }, OutN = new[] { 3 } },
+                // GenesisBook: Moebius electrolysis refines silver in a silver nitrate bath. Id after the six seawater washings.
+                new Alt { Id = ChainBase + 12, Type = Tables.Chemical, Time = 180, Row = 1, Col = 7, Tech = 3, Name = "Moebius Silver Refining", Badge = "badge-fluid",
+                    In = new[] { SilverDust, Nitric }, InN = new[] { 2, 1 }, Out = new[] { SilverIngot }, OutN = new[] { 3 } },
             };
             // GenesisBook: washing with seawater gives the same dust as water, and salt besides.
-            for (int o = 0; o < Tables.Ores.Length; o++)
+            for (int o = 0; o < Tables.BaseOres; o++)  // ids ChainBase+6.. end where Moebius (ChainBase+12) starts
                 all.Add(new Alt { Id = ChainBase + 6 + o, Type = Tables.Chemical, Time = 180, Row = 7, Col = o + 1, Tech = 3, Name = Tables.OreNames[o] + " Ore Seawater Washing", Badge = "badge-sea",
                     In = new[] { Tables.Ores[o], Seawater }, InN = new[] { 4, 2 }, Out = new[] { Tables.Dust(o), Salt }, OutN = new[] { 6, 1 } });
             return all;
@@ -361,6 +364,7 @@ namespace OreEnrichment
                 case 3: return "Silver dust smelted into ingots.";
                 case 4: return "Nitric acid parts silver from gold: more of both from the same slime than sulfuric acid gives.";
                 case 5: return "Gold dust refined by electrolysis in hydrochloric acid: three ingots from two dust.";
+                case 12: return "Silver dust refined by electrolysis in a silver nitrate bath: three ingots from two dust.";
                 default: return "Washing with seawater gives as much dust as washing with water, and salt besides.";
             }
         }

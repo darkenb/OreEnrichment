@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+- Catalysed copies for the recipes that had no alternative: GenesisBook's fluid chemistry (water and salt water electrolysis, sodium salt, methane, ammonia, nitric acid, ferric trichloride, tar cracking, coal liquefaction, seawater desalination and the rest), plasma refining, X-ray cracking, deuterium, mass-energy storage, energy materialization, and buildings without gold or silver copies (depots, tanks, foundations, plane smelters and other buildings of two or more materials).
+- A copy is now left out only if it could run on its own products with nothing from outside. Before, any loop through the recipe tree kept it out, which left most fluid chemistry without copies.
+- Recipes whose usual catalyst is one of their own items take the next harder catalyst and open at that catalyst's stage.
+- Copies of recipes the game bars from extra products stay barred from them.
+- Five rare-vein dusts: kimberlite, fractal silicon, fire ice, spiniform and unipolar magnet are crushed or washed like the other ores and smelted in two tiers (x1.5, x2) into diamond, crystal silicon, graphene, carbon nanotubes and particle containers, in rows 6 and 7 of the "Enrichment" tab.
+- With GenesisBook: aluminium and niobium dust, smelted in three tiers into aluminium and niobium ingots.
+- With GenesisBook: Moebius silver refining, 2 silver dust + 1 nitric acid -> 3 silver ingots, under Fluid Chemistry.
+
 ## 1.1.0
 
 - Dark Fog recycling on a new "Recycling" tab: the six Dark Fog drops make ammunition, matrices, fuel rods, Dyson sphere parts, combat units and a few buildings, in levels from the simplest items to the hardest, several items per recipe, each recipe worth about what its drops are worth and made in the building the game uses for its hardest item; each level is a technology after the one that unlocks its hardest item.
